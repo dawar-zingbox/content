@@ -1,0 +1,729 @@
+description: Playbook to be run every 15 minutes via a job. Each run will get incremental
+  updates for devices, and will update or create new endpoints in Cisco ISE with PANW
+  IOT discovered attributes (ISE custom attributes)
+id: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration
+inputs: []
+name: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration
+outputs: []
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "1"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: e6379eb8-aafa-4a17-875e-890a838a57ab
+      iscommand: false
+      name: ""
+      version: -1
+      description: ''
+    taskid: e6379eb8-aafa-4a17-875e-890a838a57ab
+    timertriggers: []
+    type: start
+    view: |-
+      {
+        "position": {
+          "x": 310,
+          "y": 40
+        }
+      }
+  "1":
+    continueonerror: true
+    id: "1"
+    ignoreworker: false
+    nexttasks:
+      "no":
+      - "2"
+      "yes":
+      - "3"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      brandname:
+        simple: Cisco ISE
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Returns 'yes' if integration brand is available. Otherwise returns
+        'no'
+      id: 846cca25-23fa-4233-850f-1775dee3b338
+      iscommand: false
+      name: IsIntegrationAvailable
+      script: IsIntegrationAvailable
+      type: condition
+      version: -1
+    taskid: 846cca25-23fa-4233-850f-1775dee3b338
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 310,
+          "y": 230
+        }
+      }
+  "2":
+    continueonerror: true
+    id: "2"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "18"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      integrationName:
+        simple: ise
+      message:
+        simple: Cisco ISE instance is not configured
+      playbookName:
+        simple: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration ISE
+      status:
+        simple: disabled
+      type:
+        simple: device
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Sends a status message back to PANW IOT cloud.
+      id: 3f18579d-e359-434b-8731-908e829e02ca
+      iscommand: true
+      name: panw-iot-3rd-party-report-status-to-panw
+      script: '|||panw-iot-3rd-party-report-status-to-panw'
+      type: regular
+      version: -1
+    taskid: 3f18579d-e359-434b-8731-908e829e02ca
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 20,
+          "y": 410
+        }
+      }
+  "3":
+    continueonerror: true
+    id: "3"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "4"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: This Script retrieves active/primary ISE instance
+      id: b33ca5f2-caeb-487b-8e61-7ac85c51e0f7
+      iscommand: false
+      name: GetCiscoISEActiveInstance
+      script: GetCiscoISEActiveInstance
+      type: regular
+      version: -1
+    taskid: b33ca5f2-caeb-487b-8e61-7ac85c51e0f7
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 590,
+          "y": 410
+        }
+      }
+  "4":
+    id: "4"
+    ignoreworker: false
+    nexttasks:
+      "no":
+      - "6"
+      "yes":
+      - "5"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      entryId:
+        simple: ${lastCompletedTaskEntries}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Check whether given entry/entries returned an error. Use ${lastCompletedTaskEntries}
+        to check the previous task entries. If array is provided, will return yes
+        if one of the entries returned an error.
+      id: 97d54d03-4d79-4103-893c-4f7afb56832b
+      iscommand: false
+      name: isError
+      script: isError
+      type: condition
+      version: -1
+    taskid: 97d54d03-4d79-4103-893c-4f7afb56832b
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 590,
+          "y": 580
+        }
+      }
+  "5":
+    continueonerror: true
+    id: "5"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "18"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      integrationName:
+        simple: ise
+      message:
+        simple: ${PaloAltoIoTIntegrationBase.NodeErrorStatus}
+      playbookName:
+        simple: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration ISE
+      status:
+        simple: error
+      type:
+        simple: device
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Sends a status message back to PANW IOT cloud.
+      id: 08c4d8fd-432f-49c1-8243-39bcce9f9842
+      iscommand: true
+      name: panw-iot-3rd-party-report-status-to-panw
+      script: '|||panw-iot-3rd-party-report-status-to-panw'
+      type: regular
+      version: -1
+    taskid: 08c4d8fd-432f-49c1-8243-39bcce9f9842
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 360,
+          "y": 750
+        }
+      }
+  "6":
+    continueonerror: true
+    id: "6"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "7"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      assetType:
+        simple: Device
+      incrementTime:
+        simple: "15"
+      offset: {}
+      pageLength: {}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Returns a list of assets for the specified asset type.
+      id: 2360fd51-b471-4c0e-8bee-d531e4a0bbb9
+      iscommand: true
+      name: panw-iot-3rd-party-get-asset-list
+      script: '|||panw-iot-3rd-party-get-asset-list'
+      type: regular
+      version: -1
+    taskid: 2360fd51-b471-4c0e-8bee-d531e4a0bbb9
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 870,
+          "y": 750
+        }
+      }
+  "7":
+    id: "7"
+    ignoreworker: false
+    nexttasks:
+      "no":
+      - "10"
+      "yes":
+      - "9"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      entryId:
+        simple: ${lastCompletedTaskEntries}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Check whether given entry/entries returned an error. Use ${lastCompletedTaskEntries}
+        to check the previous task entries. If array is provided, will return yes
+        if one of the entries returned an error.
+      id: 4ff3cadf-2e20-4c26-8108-39fac64613ef
+      iscommand: false
+      name: isError
+      script: isError
+      type: condition
+      version: -1
+    taskid: 4ff3cadf-2e20-4c26-8108-39fac64613ef
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 870,
+          "y": 900
+        }
+      }
+  "9":
+    continueonerror: true
+    id: "9"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "18"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      integrationName:
+        simple: ise
+      message:
+        simple: Failed to get device inventory from PANW IoT Cloud
+      playbookName:
+        simple: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration ISE
+      status:
+        simple: error
+      type:
+        simple: device
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Sends a status message back to PANW IOT cloud.
+      id: 0759227b-8550-4d57-88bd-8628a559395b
+      iscommand: true
+      name: panw-iot-3rd-party-report-status-to-panw
+      script: '|||panw-iot-3rd-party-report-status-to-panw'
+      type: regular
+      version: -1
+    taskid: 0759227b-8550-4d57-88bd-8628a559395b
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 610,
+          "y": 1070
+        }
+      }
+  "10":
+    continueonerror: true
+    id: "10"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "12"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      assetList:
+        simple: ${PanwIot3rdParty.Devices}
+      assetType:
+        simple: Device
+      outputFormat:
+        simple: CiscoISECustomAttributes
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: For a given asset (alert, device, vuln) converts it to 3rd party
+        format.
+      id: 33dc012d-3537-40af-88ed-2dc0b31bb8cd
+      iscommand: true
+      name: panw-iot-3rd-party-convert-assets-to-external-format
+      script: '|||panw-iot-3rd-party-convert-assets-to-external-format'
+      type: regular
+      version: -1
+    taskid: 33dc012d-3537-40af-88ed-2dc0b31bb8cd
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 1040,
+          "y": 1070
+        }
+      }
+  "11":
+    continueonerror: true
+    id: "11"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "18"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      integrationName:
+        simple: ise
+      message:
+        simple: Failed to convert device inventory to Cisco ISE custom attributes
+      playbookName:
+        simple: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration ISE
+      status:
+        simple: error
+      type:
+        simple: device
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Sends a status message back to PANW IOT cloud.
+      id: 7013c285-3d24-41c8-8378-12b0da9bd83a
+      iscommand: true
+      name: panw-iot-3rd-party-report-status-to-panw
+      script: '|||panw-iot-3rd-party-report-status-to-panw'
+      type: regular
+      version: -1
+    taskid: 7013c285-3d24-41c8-8378-12b0da9bd83a
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 950,
+          "y": 1450
+        }
+      }
+  "12":
+    id: "12"
+    ignoreworker: false
+    nexttasks:
+      "no":
+      - "13"
+      "yes":
+      - "11"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      entryId:
+        simple: ${lastCompletedTaskEntries}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Check whether given entry/entries returned an error. Use ${lastCompletedTaskEntries}
+        to check the previous task entries. If array is provided, will return yes
+        if one of the entries returned an error.
+      id: 12daee68-b84e-4592-8526-648b93e9ef9d
+      iscommand: false
+      name: isError
+      script: isError
+      type: condition
+      version: -1
+    taskid: 12daee68-b84e-4592-8526-648b93e9ef9d
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 1200,
+          "y": 1260
+        }
+      }
+  "13":
+    id: "13"
+    ignoreworker: false
+    nexttasks:
+      "no":
+      - "19"
+      "yes":
+      - "14"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      value:
+        simple: ${PanwIot3rdParty.CiscoISEAttributes}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Check if a given value exists in the context. Will return 'no'
+        for empty empty arrays. To be used mostly with DQ and selectors.
+      id: 251fe978-cb98-4e5e-8c84-d399818ee247
+      iscommand: false
+      name: Exists
+      script: Exists
+      type: condition
+      version: -1
+    taskid: 251fe978-cb98-4e5e-8c84-d399818ee247
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 1470,
+          "y": 1450
+        }
+      }
+  "14":
+    continueonerror: true
+    id: "14"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "15"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      active_ise_instance:
+        simple: ${PaloAltoIoTIntegrationBase.ActiveNodeInstance}
+      device_maps:
+        simple: ${PanwIot3rdParty.CiscoISEAttributes}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: This script takes in custom attributes from PANW IoT cloud as an
+        argument and creates or updates endpoints in ISE with the  input custom attributes.
+      id: 3787ee62-4baf-4919-8d49-a101e926c00e
+      iscommand: false
+      name: SendPANWIoTDevicesToCiscoISE
+      script: SendPANWIoTDevicesToCiscoISE
+      type: regular
+      version: -1
+    taskid: 3787ee62-4baf-4919-8d49-a101e926c00e
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 1480,
+          "y": 1640
+        }
+      }
+  "15":
+    id: "15"
+    ignoreworker: false
+    nexttasks:
+      "no":
+      - "17"
+      "yes":
+      - "16"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      entryId:
+        simple: ${lastCompletedTaskEntries}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Check whether given entry/entries returned an error. Use ${lastCompletedTaskEntries}
+        to check the previous task entries. If array is provided, will return yes
+        if one of the entries returned an error.
+      id: fdd8a42a-2f7a-423d-88d5-47aa45fadd49
+      iscommand: false
+      name: isError
+      script: isError
+      type: condition
+      version: -1
+    taskid: fdd8a42a-2f7a-423d-88d5-47aa45fadd49
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 1480,
+          "y": 1810
+        }
+      }
+  "16":
+    continueonerror: true
+    id: "16"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "18"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      integrationName:
+        simple: ise
+      message:
+        simple: Failed to export PANW IoT devices to Cisco ISE
+      playbookName:
+        simple: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration ISE
+      status:
+        simple: error
+      type:
+        simple: device
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Sends a status message back to PANW IOT cloud.
+      id: 0bc90108-a5d0-41b4-8439-075e7c209a04
+      iscommand: true
+      name: panw-iot-3rd-party-report-status-to-panw
+      script: '|||panw-iot-3rd-party-report-status-to-panw'
+      type: regular
+      version: -1
+    taskid: 0bc90108-a5d0-41b4-8439-075e7c209a04
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 1200,
+          "y": 2010
+        }
+      }
+  "17":
+    continueonerror: true
+    id: "17"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "18"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      integrationName:
+        simple: ise
+      message:
+        simple: ${PaloAltoIoTIntegrationBase.Status}
+      playbookName:
+        simple: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration ISE
+      status:
+        simple: success
+      type:
+        simple: device
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Sends a status message back to PANW IOT cloud.
+      id: c27259c7-85e2-4998-8d89-7865601a7f3b
+      iscommand: true
+      name: panw-iot-3rd-party-report-status-to-panw
+      script: '|||panw-iot-3rd-party-report-status-to-panw'
+      type: regular
+      version: -1
+    taskid: c27259c7-85e2-4998-8d89-7865601a7f3b
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 1670,
+          "y": 2000
+        }
+      }
+  "18":
+    id: "18"
+    ignoreworker: false
+    note: false
+    quietmode: 0
+    scriptarguments:
+      assetid: {}
+      closeNotes: {}
+      closeReason: {}
+      code42alerttype: {}
+      emailclassification: {}
+      id: {}
+      phishingsubtype: {}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: Builtin
+      description: Close the current incident
+      id: 0332eed7-7a30-4d88-8b0a-1e63b93fde83
+      iscommand: true
+      name: closeInvestigation
+      script: Builtin|||closeInvestigation
+      type: regular
+      version: -1
+    taskid: 0332eed7-7a30-4d88-8b0a-1e63b93fde83
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 20,
+          "y": 2350
+        }
+      }
+  "19":
+    continueonerror: true
+    id: "19"
+    ignoreworker: false
+    nexttasks:
+      '#none#':
+      - "18"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      integrationName:
+        simple: ise
+      message:
+        simple: No new devices available for exporting to ISE
+      playbookName:
+        simple: Incremental Export to Cisco ISE - PANW IoT 3rd Party Integration ISE
+      status:
+        simple: success
+      type:
+        simple: device
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Sends a status message back to PANW IOT cloud.
+      id: 7d1292b8-e5e7-4973-89ab-b70a02e8c8ef
+      iscommand: true
+      name: panw-iot-3rd-party-report-status-to-panw
+      script: '|||panw-iot-3rd-party-report-status-to-panw'
+      type: regular
+      version: -1
+    taskid: 7d1292b8-e5e7-4973-89ab-b70a02e8c8ef
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 1060,
+          "y": 1640
+        }
+      }
+version: -1
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 2405,
+        "width": 2030,
+        "x": 20,
+        "y": 40
+      }
+    }
+  }
+fromversion: 6.0.0
+tests:
+- No tests (auto formatted)
